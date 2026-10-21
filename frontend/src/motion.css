@@ -1,0 +1,161 @@
+.hero-copy {
+    animation: fade-up .65s cubic-bezier(.2, .7, .2, 1) both
+}
+
+.hero-card {
+    animation: fade-up .75s .13s cubic-bezier(.2, .7, .2, 1) both;
+    background: linear-gradient(135deg, #2b282c 0%, #5b4146 100%);
+    isolation: isolate
+}
+
+.hero-card-content {
+    position: relative;
+    z-index: 2
+}
+
+.hero-card p {
+    color: #ffc2bc;
+    margin: 0 0 8px;
+    font-weight: 520
+}
+
+.hero-card b {
+    display: block;
+    font-size: 24px;
+    line-height: 1.15;
+    max-width: 255px;
+    letter-spacing: -.025em
+}
+
+.orbit {
+    position: absolute;
+    border: 36px solid #ef3124;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none
+}
+
+.orbit-one {
+    width: 240px;
+    height: 240px;
+    right: -90px;
+    top: -105px;
+    opacity: .96;
+    animation: float 7s ease-in-out infinite
+}
+
+.orbit-two {
+    width: 104px;
+    height: 104px;
+    border-width: 16px;
+    right: 60px;
+    top: 38px;
+    border-color: #f58b80;
+    opacity: .38;
+    animation: float 5s -1s ease-in-out infinite reverse
+}
+
+.spark {
+    z-index: 1;
+    right: 26px;
+    top: 29px;
+    font-size: 32px;
+    color: #ffdf70;
+    filter: drop-shadow(0 4px 7px #0005);
+    animation: twinkle 2.8s ease-in-out infinite
+}
+
+.progress i:first-child {
+    animation: progress-pulse 2.4s ease-in-out infinite
+}
+
+.button span {
+    margin-left: 9px;
+    transition: transform .2s
+}
+
+.button:hover span {
+    transform: translateX(3px)
+}
+
+.button.outline {
+    transition: color .2s, background .2s, transform .2s, box-shadow .2s
+}
+
+.button.outline:hover {
+    background: #fff0ef;
+    box-shadow: 0 8px 20px #ef31241c
+}
+
+.product-card {
+    transition: transform .25s ease, box-shadow .25s ease
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px #24242912
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(15px)
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0)
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0)
+    }
+
+    50% {
+        transform: translate(-8px, 12px) rotate(7deg)
+    }
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        transform: scale(.88) rotate(-8deg);
+        opacity: .75
+    }
+
+    50% {
+        transform: scale(1.08) rotate(10deg);
+        opacity: 1
+    }
+}
+
+@keyframes progress-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scaleX(1);
+        transform-origin: left
+    }
+
+    50% {
+        opacity: .66;
+        transform: scaleX(.65)
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+
+    *,
+    *:before,
+    *:after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important
+    }
+}
