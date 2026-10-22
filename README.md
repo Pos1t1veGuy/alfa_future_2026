@@ -1,30 +1,59 @@
-# Умный кредитный кабинет предпринимателя
+# Альфа-Бизнес — кредитный кабинет
 
-MVP для хакатона Альфа-Банка: личный кабинет малого и микробизнеса, который проводит клиента от выбора финансирования к результату по заявке.
+Демонстрационный MVP: предприниматель регистрируется, выбирает кредитный продукт, отправляет заявку и документы; сотрудник банка видит очередь и меняет статус заявки. Данные и действия в основных сценариях сохраняются в PostgreSQL через Django REST API. Фронтенд больше не запускает MSW и не использует demo-массивы для экранов кабинета.
 
-## Стек
+## Запуск
 
-- Backend: Python 3.11, Django, Django REST Framework, PostgreSQL; Django Channels подключается после базового REST-конвейера.
-- Frontend: React, TypeScript, Vite.
-- Infrastructure: Docker / Docker Compose, Nginx для production frontend.
+1. Создайте `.env` в корне проекта. Минимальные локальные значения:
 
-## Frontend
+```dotenv
+POSTGRES_DB=alfa_hack
+POSTGRES_USER=alfa_user
+POSTGRES_PASSWORD=change_me
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=alfa_hack
+DB_USER=alfa_user
+DB_PASSWORD=change_me
+DJANGO_SECRET_KEY=replace_with_a_long_random_secret
+DJANGO_DEBUG=1
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend
+CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1
+VITE_API_URL=/api/v1
+VITE_USE_MOCKS=false
+```
 
-Исходный код и контракт с backend находятся в [frontend/README.md](frontend/README.md).
+2. Запустите сервисы:
 
-## MVP-сценарий
+```bash
+docker compose up -d --build
+docker compose ps
+docker compose logs --tail=100 backend
+```
 
-1. Предприниматель выбирает кредитный продукт.
-2. Указывает сумму, срок и цель.
-3. Создаётся заявка со статусом `submitted`.
-4. Клиент видит этапы обработки и новости по заявке.
-5. Backend-правила переводят её в `review`, `additional_info`, `approved` или `declined`.
+Frontend: http://localhost  
+Django API: http://localhost:8000/api/v1/
 
-## Что нужно подготовить команде
+3. Регистрация предпринимателя доступна на стартовом экране. Для локального демонстрационного кабинета сотрудника compose выполняет `seed_demo`:
 
-- `docker-compose.yml` для frontend, Django и PostgreSQL;
-- OpenAPI/Swagger из DRF;
-- диаграмму состояний заявки и модель данных;
-- синтетические компании, заявки, финансовые показатели и мок-проверки БКИ/ЕГРЮЛ;
-- правила скоринга и принятия решения, явно обозначенные как упрощённые;
-- тестовые сценарии, `THIRD_PARTY_NOTICES` и инструкции запуска.
+- Email: `manager@alfa.local`
+- Пароль: `DemoManager2026!`
+
+Эти демонстрационные учётные данные нельзя использовать в публичной/боевой среде. Перед любым общим развёртыванием измените или удалите команду `seed_demo` и задайте собственный секрет Django.
+
+## Реализованные API
+
+- `POST /api/v1/auth/register/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/refresh/`, `GET/PATCH /api/v1/me/`
+- `GET /api/v1/products/`
+- `GET/POST /api/v1/applications/`, `GET/PATCH /api/v1/applications/{id}/`, `GET /api/v1/bank/applications/`
+- `POST /api/v1/documents/`, `POST /api/v1/documents/{id}/ocr/`
+- `POST /api/v1/safe-limit/calculate/`
+- `GET /api/v1/notifications/`, `POST /api/v1/notifications/read-all/`, `POST /api/v1/notifications/{id}/read/`
+
+JWT access/refresh хранится в localStorage для демонстрационного SPA. OCR и расчёт безопасного лимита используют упрощённые демонстрационные правила, не банковское решение. Для промышленного использования потребуются полноценные тесты, объектное хранилище документов, аудит, rate limiting, управление ролями и миграции схемы.
+
+## Важно
+
+- `.env` не добавляйте в Git.
+- Локальный Vite использует proxy на `localhost:8000`; Docker/Nginx проксирует `/api/` к backend.
+- `VITE_USE_MOCKS` оставлен для совместимости с прежним `.env`, но `main.tsx` не запускает MSW.
