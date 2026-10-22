@@ -117,6 +117,28 @@ class ApplicationDetailView(APIView):
         Notification.objects.create(user=app.client,application=app,title='Статус заявки изменён',body=f'{app.id}: {dict(LoanApplication.STATUSES).get(new_status,new_status)}. {app.decision_comment}')
         return Response(ApplicationSerializer(app).data)
 
+class SubmitAdditionalInfoView(APIView):
+    def post(self, request, pk):
+        app = get_object_or_404(LoanApplication, pk=pk)
+        role = getattr(getattr(request.user, 'profile', None), 'role', 'client')
+        if app.client_id != request.user.id or role in ('bank_manager', 'admin'):
+            return Response({'message': 'Только владелец заявки может отправить уточнения.'}, status=403)
+        if app.status != 'additional_info':
+            return Response({'message': 'Отправить документы можно, когда банк запросил уточнения.'}, status=400)
+        documents = list(app.documents.all())
+        if not documents:
+            return Response({'message': 'Сначала прикрепите хотя бы один документ.'}, status=400)
+        names = ', '.join(doc.filename for doc in documents[-5:])
+        app.status = 'review'
+        app.decision_comment = f'Клиент предоставил дополнительные документы: {names}'
+        app.save(update_fields=['status', 'decision_comment', 'updated_at'])
+        ApplicationHistory.objects.create(application=app, status='review', author=request.user.get_full_name() or request.user.username, comment=app.decision_comment)
+        managers = User.objects.filter(profile__role__in=['bank_manager', 'admin'])
+        for manager in managers:
+            Notification.objects.create(user=manager, application=app, title='Клиент предоставил уточнения', body=f'{app.id}: {app.company}. {app.decision_comment}')
+        return Response(ApplicationSerializer(app).data)
+
+
 class NotificationsView(APIView):
     def get(self, request):
         qs=Notification.objects.filter(user=request.user).order_by('-created_at')
@@ -149,6 +171,17 @@ class SafeLimitView(APIView):
 
 class DocumentUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
+    def get(self, request):
+        application_id = request.query_params.get('applicationId')
+        if not application_id:
+            return Response({'message': 'Укажите applicationId.'}, status=400)
+        app = get_object_or_404(LoanApplication, pk=application_id)
+        role = getattr(getattr(request.user, 'profile', None), 'role', 'client')
+        if app.client_id != request.user.id and role not in ('bank_manager', 'admin'):
+            return Response({'message': 'Нет доступа к заявке.'}, status=403)
+        items = app.documents.order_by('created_at')
+        return Response({'items': [{'id': str(doc.id), 'filename': doc.filename, 'size': doc.size, 'status': doc.status, 'createdAt': doc.created_at} for doc in items]})
+
     def post(self, request):
         file = request.FILES.get('file')
         if not file: return Response({'message':'Выберите файл для загрузки.'}, status=400)
