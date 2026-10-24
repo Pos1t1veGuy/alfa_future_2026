@@ -186,6 +186,7 @@ class DocumentUploadView(APIView):
     def post(self, request):
         file = request.FILES.get('file')
         if not file: return Response({'message':'Выберите файл для загрузки.'}, status=400)
+        if file.size == 0: return Response({'message':'Нельзя загрузить пустой файл.'}, status=400)
         if file.size > 10 * 1024 * 1024: return Response({'message':'Максимальный размер файла — 10 МБ.'}, status=413)
         if not file.name.lower().endswith(('.pdf','.jpg','.jpeg','.png')):
             return Response({'message':'Поддерживаются PDF, JPG и PNG.'}, status=415)
