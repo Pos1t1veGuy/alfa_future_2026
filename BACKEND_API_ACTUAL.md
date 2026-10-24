@@ -295,7 +295,7 @@ Authorization: Bearer <accessToken>
 | `403` | `{ "message": "Только владелец заявки может отправить уточнения." }` |
 | `404` | `{ "detail": "No LoanApplication matches the given query." }` |
 
-## Документы и OCR
+## Документы
 
 ### `GET /documents/?applicationId={id}`
 
@@ -359,27 +359,6 @@ Authorization: Bearer <accessToken>
 | `404` | `{ "detail": "No LoanApplication matches the given query." }` |
 | `413` | `{ "message": "Максимальный размер файла — 10 МБ." }` |
 | `415` | `{ "message": "Поддерживаются PDF, JPG и PNG." }` |
-
-### `POST /documents/{id}/ocr/`
-
-Запускает демо-OCR для владельца, менеджера или администратора.
-
-Ответ `200 OK`:
-
-```json
-{
-  "documentId": "12",
-  "status": "PARSED",
-  "confidence": 0.94,
-  "extractedFields": {
-    "inn": "7701234567",
-    "revenue": 1500000,
-    "companyName": "ООО Альфа"
-  }
-}
-```
-
-Ошибки: `403` - `{ "message": "Нет доступа к документу." }`; `404` - `{ "detail": "No UploadedDocument matches the given query." }`.
 
 ## Калькулятор безопасного лимита
 
@@ -472,7 +451,7 @@ Runtime-frontend уже обращается к реальному backend че�
 - login/register/refresh/me;
 - продукты, список и карточка заявок;
 - создание заявки и банковский `PATCH` решения;
-- документы, OCR и повторная отправка уточнений;
+- документы и повторная отправка уточнений;
 - калькулятор безопасного лимита;
 - уведомления и профиль.
 

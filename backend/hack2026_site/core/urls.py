@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import LoginView, RegisterView, MeView, ProductsView, ApplicationsView, ApplicationDetailView, NotificationsView, NotificationReadView, SafeLimitView, DocumentOCRView, DocumentUploadView, DocumentDownloadView, SubmitAdditionalInfoView, logout_view
+from .views import LoginView, RegisterView, MeView, ProductsView, ApplicationsView, ApplicationDetailView, NotificationsView, NotificationReadView, SafeLimitView, DocumentUploadView, DocumentDownloadView, SubmitAdditionalInfoView, logout_view
 
 urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='api-login'),
@@ -19,5 +19,4 @@ urlpatterns = [
     path('safe-limit/calculate/', SafeLimitView.as_view(), name='api-safe-limit'),
     path('documents/', DocumentUploadView.as_view(), name='api-document-upload'),
     path('documents/<int:pk>/download/', DocumentDownloadView.as_view(), name='api-document-download'),
-    path('documents/<int:pk>/ocr/', DocumentOCRView.as_view(), name='api-document-ocr'),
 ]

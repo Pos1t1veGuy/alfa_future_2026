@@ -56,11 +56,11 @@ Django API: http://localhost:8000/api/v1/
 - `POST /api/v1/auth/register/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/refresh/`, `GET/PATCH /api/v1/me/`
 - `GET /api/v1/products/`
 - `GET/POST /api/v1/applications/`, `GET/PATCH /api/v1/applications/{id}/`, `GET /api/v1/bank/applications/`
-- `GET/POST /api/v1/documents/`, `GET /api/v1/documents/{id}/download/`, `POST /api/v1/documents/{id}/ocr/`
+- `GET/POST /api/v1/documents/`, `GET /api/v1/documents/{id}/download/`
 - `POST /api/v1/safe-limit/calculate/`
 - `GET /api/v1/notifications/`, `POST /api/v1/notifications/read-all/`, `POST /api/v1/notifications/{id}/read/`
 
 Полный фактический контракт с JSON-примерами, статусами и ошибками: [BACKEND_API_ACTUAL.md](BACKEND_API_ACTUAL.md).
 Контракт Django Admin, права доступа и схема PostgreSQL: [DJANGO_ADMIN_CONTRACTS.md](DJANGO_ADMIN_CONTRACTS.md).
 
-JWT access/refresh хранится в localStorage для демонстрационного SPA. OCR и расчёт безопасного лимита используют упрощённые демонстрационные правила, не банковское решение. Для промышленного использования потребуются полноценные тесты, объектное хранилище документов, аудит, rate limiting, управление ролями и миграции схемы.
+JWT access/refresh хранится в localStorage для демонстрационного SPA. Расчёт безопасного лимита использует упрощённые демонстрационные правила, не банковское решение. Для промышленного использования потребуются полноценные тесты, объектное хранилище документов, аудит, rate limiting, управление ролями и миграции схемы.

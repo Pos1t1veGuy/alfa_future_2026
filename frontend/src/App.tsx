@@ -6,7 +6,7 @@ import { api, errorMessage } from './api/client'
 type Product = { id: string; name: string; description: string; rate: string; maxAmount: number; term: string; icon: string; minTermMonths?: number; maxTermMonths?: number }
 type HistoryItem = { id: number | string; status: string; date: string; author: string; comment: string }
 type Application = { id: string; productId: string; productName: string; amount: number; termMonths: number; purpose: string; company: string; inn: string; status: string; createdAt: string; clientName: string; historyItems: HistoryItem[]; managerName: string; decision_comment?: string }
-type Document = { id: string; filename: string; size?: number; status: string; createdAt?: string; ocr?: any }
+type Document = { id: string; filename: string; size?: number; status: string; createdAt?: string }
 type Notice = { id: number; title: string; body: string; isRead: boolean; createdAt: string; applicationId?: string }
 const money = (n: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(Number(n || 0))
 const date = (v: string) => v ? new Date(v).toLocaleString('ru-RU', { dateStyle: 'medium', timeStyle: 'short' }) : '—'
@@ -112,7 +112,7 @@ function StatusNotice({status,comment}:{status:string;comment?:string}) {
 function DocumentsPanel({applicationId,bank=false}:{applicationId:string;bank?:boolean}) {
   const [docs,setDocs]=useState<Document[]>([]);const [loading,setLoading]=useState(true);const [error,setError]=useState('')
   useEffect(()=>{let active=true;async function load(){setLoading(true);setError('');try{const {data}=await api.get(`/documents/?applicationId=${encodeURIComponent(applicationId)}`);if(active)setDocs(data.items||[])}catch(e){if(active)setError(errorMessage(e))}finally{if(active)setLoading(false)}}void load();return()=>{active=false}},[applicationId])
-  return <article className="panel documents-panel"><div className="panel-title-row"><h2>{bank?'Документы клиента':'Мои документы'}</h2><span>Защищённый просмотр</span></div>{loading?<Loading label="Загружаем документы…"/>:error?<div className="error-box">{error}</div>:docs.length?<div className="document-list">{docs.map(doc=><DocumentRow key={doc.id} doc={doc} showOcr={bank}/>)}</div>:<p className="panel-help">Документы пока не прикреплены.</p>}</article>
+  return <article className="panel documents-panel"><div className="panel-title-row"><h2>{bank?'Документы клиента':'Мои документы'}</h2><span>Защищённый просмотр</span></div>{loading?<Loading label="Загружаем документы…"/>:error?<div className="error-box">{error}</div>:docs.length?<div className="document-list">{docs.map(doc=><DocumentRow key={doc.id} doc={doc}/>)}</div>:<p className="panel-help">Документы пока не прикреплены.</p>}</article>
 }
 function ClientAdditionalInfo({applicationId,onSubmitted}:{applicationId:string;onSubmitted:(app:Application)=>void}) {
   const [docs,setDocs]=useState<Document[]>([])
@@ -127,12 +127,11 @@ function SelectedFiles({files}:{files:File[]}) {
   function preview(file:File){const url=URL.createObjectURL(file);const tab=window.open(url,'_blank','noopener,noreferrer');if(!tab){const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.click()}window.setTimeout(()=>URL.revokeObjectURL(url),60000)}
   return <div className="selected-files">{files.map(file=><div className="selected-file" key={`${file.name}-${file.size}-${file.lastModified}`}><span>{file.name} · {(file.size/1024/1024).toFixed(1)} МБ</span><button type="button" className="text-button" onClick={()=>preview(file)}>Предпросмотр</button></div>)}</div>
 }
-function DocumentRow({doc,showOcr=true}:{doc:Document;showOcr?:boolean}) {
-  const [busy,setBusy]=useState(false);const [opening,setOpening]=useState(false);const [result,setResult]=useState<any>(doc.ocr||null);const [error,setError]=useState('')
-  async function recognize(){setBusy(true);setError('');try{const {data}=await api.post(`/documents/${doc.id}/ocr/`);setResult(data)}catch(e){setError(errorMessage(e))}finally{setBusy(false)}}
+function DocumentRow({doc}:{doc:Document}) {
+  const [opening,setOpening]=useState(false);const [error,setError]=useState('')
   async function open(){setOpening(true);setError('');try{const {data}=await api.get(`/documents/${doc.id}/download/`,{responseType:'blob'});const url=URL.createObjectURL(data);const tab=window.open(url,'_blank','noopener,noreferrer');if(!tab){const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.click()}window.setTimeout(()=>URL.revokeObjectURL(url),60000)}catch(e){setError(errorMessage(e))}finally{setOpening(false)}}
   const isEmpty=doc.size===0
-  return <div className="uploaded-doc-row"><div><b>{doc.filename}</b><small>{isEmpty?'Файл пустой — попросите клиента загрузить его повторно.':`${result?'Распознано':'Загружено на сервер'}${doc.size?` · ${(doc.size/1024/1024).toFixed(1)} МБ`:''}`}</small>{result&&<small>ИНН: {result.extractedFields?.inn||'—'} · Выручка: {money(result.extractedFields?.revenue||0)}</small>}{error&&<small className="field-error">{error}</small>}</div><div className="doc-actions"><button className="button outline" disabled={opening||isEmpty} onClick={open}>{opening?'Открываем…':'Открыть'}</button>{showOcr&&<button className="button outline" disabled={busy||isEmpty} onClick={recognize}>{busy?'Распознаём…':result?'Распознать ещё раз':'Распознать OCR'}</button>}</div></div>
+  return <div className="uploaded-doc-row"><div><b>{doc.filename}</b><small>{isEmpty?'Файл пустой — попросите клиента загрузить его повторно.':`Загружено на сервер${doc.size?` · ${(doc.size/1024/1024).toFixed(1)} МБ`:''}`}</small>{error&&<small className="field-error">{error}</small>}</div><div className="doc-actions"><button className="button outline" disabled={opening||isEmpty} onClick={open}>{opening?'Открываем…':'Открыть'}</button></div></div>
 }
 function BankQueue() {
   const [query,setQuery]=useState('');const [status,setStatus]=useState('');const [refresh,setRefresh]=useState(0)

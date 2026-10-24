@@ -197,16 +197,6 @@ class DocumentUploadView(APIView):
         doc = UploadedDocument.objects.create(application=app,user=request.user,file=file,filename=file.name,size=file.size)
         return Response({'id':str(doc.id),'filename':doc.filename,'size':doc.size,'status':doc.status},status=201)
 
-class DocumentOCRView(APIView):
-    def post(self, request, pk):
-        doc = get_object_or_404(UploadedDocument.objects.select_related('application','user'), pk=pk)
-        role = getattr(getattr(request.user, 'profile', None), 'role', 'client')
-        if doc.application.client_id != request.user.id and role not in ('bank_manager','admin'):
-            return Response({'message':'Нет доступа к документу.'},status=403)
-        doc.status='PARSED'; doc.save(update_fields=['status'])
-        profile = getattr(doc.application.client, 'profile', None)
-        return Response({'documentId':str(doc.id),'status':'PARSED','confidence':0.94,'extractedFields':{'inn':getattr(profile,'inn',''),'revenue':1500000,'companyName':getattr(profile,'company_name','')}})
-
 class DocumentDownloadView(APIView):
     """Serve a document only after checking the application-level access rule."""
     def get(self, request, pk):
