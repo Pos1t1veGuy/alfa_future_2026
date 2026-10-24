@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenBlacklistView,
 )
 
-from .views import MeView
+from .views import MeView, RegisterView
 
 app_name = "AUTH"
 
