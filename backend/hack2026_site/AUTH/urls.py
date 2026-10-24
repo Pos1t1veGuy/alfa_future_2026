@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenBlacklistView,
 )
 
-from .views import MeView
+from .views import MeView, RegisterView
 
 app_name = "AUTH"
 
@@ -14,4 +14,5 @@ urlpatterns = [
     path("refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("logout/", TokenBlacklistView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
+    path("register/", RegisterView.as_view(), name="register"),
 ]
