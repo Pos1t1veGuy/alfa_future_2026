@@ -39,6 +39,11 @@ Django API: http://localhost:8000/api/v1/
 - Email: `manager@alfa.local`
 - Пароль: `DemoManager2026!`
 
+Для демонстрации клиентского сценария также создаётся обычный пользователь:
+
+- Email: `client@alfa.local`
+- Пароль: `DemoClient2026!`
+
 Эти демонстрационные учётные данные нельзя использовать в публичной/боевой среде. Перед любым общим развёртыванием измените или удалите команду `seed_demo` и задайте собственный секрет Django.
 
 ## Реализованные API
@@ -46,7 +51,7 @@ Django API: http://localhost:8000/api/v1/
 - `POST /api/v1/auth/register/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/refresh/`, `GET/PATCH /api/v1/me/`
 - `GET /api/v1/products/`
 - `GET/POST /api/v1/applications/`, `GET/PATCH /api/v1/applications/{id}/`, `GET /api/v1/bank/applications/`
-- `POST /api/v1/documents/`, `POST /api/v1/documents/{id}/ocr/`
+- `GET/POST /api/v1/documents/`, `GET /api/v1/documents/{id}/download/`, `POST /api/v1/documents/{id}/ocr/`
 - `POST /api/v1/safe-limit/calculate/`
 - `GET /api/v1/notifications/`, `POST /api/v1/notifications/read-all/`, `POST /api/v1/notifications/{id}/read/`
 

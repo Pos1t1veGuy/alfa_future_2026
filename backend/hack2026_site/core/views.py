@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes, parser_classes
@@ -204,6 +205,21 @@ class DocumentOCRView(APIView):
         doc.status='PARSED'; doc.save(update_fields=['status'])
         profile = getattr(doc.application.client, 'profile', None)
         return Response({'documentId':str(doc.id),'status':'PARSED','confidence':0.94,'extractedFields':{'inn':getattr(profile,'inn',''),'revenue':1500000,'companyName':getattr(profile,'company_name','')}})
+
+class DocumentDownloadView(APIView):
+    """Serve a document only after checking the application-level access rule."""
+    def get(self, request, pk):
+        doc = get_object_or_404(UploadedDocument.objects.select_related('application'), pk=pk)
+        role = getattr(getattr(request.user, 'profile', None), 'role', 'client')
+        if doc.application.client_id != request.user.id and role not in ('bank_manager', 'admin'):
+            return Response({'message': 'Нет доступа к документу.'}, status=403)
+        if not doc.file:
+            return Response({'message': 'Файл не найден в хранилище.'}, status=404)
+        try:
+            doc.file.open('rb')
+        except FileNotFoundError:
+            return Response({'message': 'Файл не найден в хранилище.'}, status=404)
+        return FileResponse(doc.file, as_attachment=False, filename=doc.filename)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])

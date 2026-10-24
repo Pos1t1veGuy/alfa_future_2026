@@ -9,8 +9,17 @@ class Command(BaseCommand):
         manager, created = User.objects.get_or_create(username='manager@alfa.local', defaults={
             'email':'manager@alfa.local','first_name':'Алексей','last_name':'Смирнов','is_staff':True
         })
-        if created: manager.set_password('DemoManager2026!'); manager.save()
+        if created or not manager.check_password('DemoManager2026!'):
+            manager.set_password('DemoManager2026!'); manager.save()
         Profile.objects.update_or_create(user=manager, defaults={'role':'bank_manager','company_name':'Альфа-Бизнес'})
+        client, created = User.objects.get_or_create(username='client@alfa.local', defaults={
+            'email':'client@alfa.local','first_name':'Ирина','last_name':'Соколова'
+        })
+        if created or not client.check_password('DemoClient2026!'):
+            client.set_password('DemoClient2026!'); client.save()
+        Profile.objects.update_or_create(user=client, defaults={
+            'role':'client', 'company_name':'ООО «Вектор»', 'inn':'7704123456', 'phone':'+79991234567'
+        })
         products = [
             ('turnover','На пополнение оборотных средств','Закупайте товар, оплачивайте аренду и закрывайте кассовые разрывы.','от 18,5%',10000000,'до 36 месяцев','↻',3,36),
             ('equipment','На оборудование','Обновляйте технику и развивайте производство без изъятия всей суммы из оборота.','от 17,9%',15000000,'до 60 месяцев','⌘',6,60),
@@ -18,4 +27,4 @@ class Command(BaseCommand):
         ]
         for row in products:
             Product.objects.get_or_create(id=row[0], defaults={'name':row[1],'description':row[2],'rate':row[3],'max_amount':row[4],'term':row[5],'icon':row[6],'min_term_months':row[7],'max_term_months':row[8]})
-        self.stdout.write(self.style.SUCCESS('Demo products are ready. Bank demo login: manager@alfa.local / DemoManager2026!'))
+        self.stdout.write(self.style.SUCCESS('Demo products are ready. Bank: manager@alfa.local / DemoManager2026!; client: client@alfa.local / DemoClient2026!'))
