@@ -50,6 +50,8 @@ Django API: http://localhost:8000/api/v1/
 - `POST /api/v1/safe-limit/calculate/`
 - `GET /api/v1/notifications/`, `POST /api/v1/notifications/read-all/`, `POST /api/v1/notifications/{id}/read/`
 
+Полный фактический контракт с JSON-примерами, статусами и ошибками: [BACKEND_API_ACTUAL.md](BACKEND_API_ACTUAL.md).
+
 JWT access/refresh хранится в localStorage для демонстрационного SPA. OCR и расчёт безопасного лимита используют упрощённые демонстрационные правила, не банковское решение. Для промышленного использования потребуются полноценные тесты, объектное хранилище документов, аудит, rate limiting, управление ролями и миграции схемы.
 
 ## Важно
