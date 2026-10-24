@@ -14,7 +14,6 @@
     "@tanstack/react-query": "^5.104.5",
     "@vitejs/plugin-react": "latest",
     "axios": "^1.20.0",
-    "msw": "^3.0.3",
     "react": "latest",
     "react-dom": "latest",
     "react-hook-form": "^7.90.0",
@@ -32,10 +31,5 @@
     "eslint-plugin-react-refresh": "latest",
     "globals": "latest",
     "typescript-eslint": "latest"
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
-    ]
   }
 }

@@ -12,6 +12,16 @@ class Command(BaseCommand):
         if created or not manager.check_password('DemoManager2026!'):
             manager.set_password('DemoManager2026!'); manager.save()
         Profile.objects.update_or_create(user=manager, defaults={'role':'bank_manager','company_name':'Альфа-Бизнес'})
+        admin, created = User.objects.get_or_create(username='admin@alfa.local', defaults={
+            'email':'admin@alfa.local', 'first_name':'Администратор', 'last_name':'Системы',
+            'is_staff':True, 'is_superuser':True,
+        })
+        if created or not admin.check_password('DemoAdmin2026!'):
+            admin.set_password('DemoAdmin2026!')
+        admin.is_staff = True
+        admin.is_superuser = True
+        admin.save()
+        Profile.objects.update_or_create(user=admin, defaults={'role':'admin','company_name':'Альфа-Бизнес'})
         client, created = User.objects.get_or_create(username='client@alfa.local', defaults={
             'email':'client@alfa.local','first_name':'Ирина','last_name':'Соколова'
         })
@@ -27,4 +37,4 @@ class Command(BaseCommand):
         ]
         for row in products:
             Product.objects.get_or_create(id=row[0], defaults={'name':row[1],'description':row[2],'rate':row[3],'max_amount':row[4],'term':row[5],'icon':row[6],'min_term_months':row[7],'max_term_months':row[8]})
-        self.stdout.write(self.style.SUCCESS('Demo products are ready. Bank: manager@alfa.local / DemoManager2026!; client: client@alfa.local / DemoClient2026!'))
+        self.stdout.write(self.style.SUCCESS('Demo products are ready. Admin: admin@alfa.local / DemoAdmin2026!; Bank: manager@alfa.local / DemoManager2026!; client: client@alfa.local / DemoClient2026!'))

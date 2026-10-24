@@ -44,6 +44,11 @@ Django API: http://localhost:8000/api/v1/
 - Email: `client@alfa.local`
 - Пароль: `DemoClient2026!`
 
+Для Django Admin (`http://localhost:8000/admin/`) создаётся суперпользователь:
+
+- Логин: `admin@alfa.local`
+- Пароль: `DemoAdmin2026!`
+
 Эти демонстрационные учётные данные нельзя использовать в публичной/боевой среде. Перед любым общим развёртыванием измените или удалите команду `seed_demo` и задайте собственный секрет Django.
 
 ## Реализованные API
@@ -56,5 +61,6 @@ Django API: http://localhost:8000/api/v1/
 - `GET /api/v1/notifications/`, `POST /api/v1/notifications/read-all/`, `POST /api/v1/notifications/{id}/read/`
 
 Полный фактический контракт с JSON-примерами, статусами и ошибками: [BACKEND_API_ACTUAL.md](BACKEND_API_ACTUAL.md).
+Контракт Django Admin, права доступа и схема PostgreSQL: [DJANGO_ADMIN_CONTRACTS.md](DJANGO_ADMIN_CONTRACTS.md).
 
 JWT access/refresh хранится в localStorage для демонстрационного SPA. OCR и расчёт безопасного лимита используют упрощённые демонстрационные правила, не банковское решение. Для промышленного использования потребуются полноценные тесты, объектное хранилище документов, аудит, rate limiting, управление ролями и миграции схемы.
